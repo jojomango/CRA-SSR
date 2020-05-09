@@ -48,7 +48,7 @@ exports.render = (routes) => {
           return res.status(404).end(); // WARNING: This 404 will be handled by Express server and won't be your React 404 component.
         }
 
-        // const location = req.url;
+        const location = req.url;
 
         if (is404) {
           /**
@@ -75,7 +75,7 @@ exports.render = (routes) => {
          * rendered HTML and only attach event handlers. 
          * (https://reactjs.org/docs/react-dom-server.html#rendertostring)
          */
-        const jsx = <App store={store} />;
+        const jsx = <App store={store} location={location} />;
         const reactDom = renderToString(jsx);
         // const reactDom = renderToString(<App />);
 

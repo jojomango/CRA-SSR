@@ -1,12 +1,43 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
+import { StaticRouter } from 'react-router';
 import Home from './components/Home';
+import Page from './components/Page';
+import NoMatch from './components/NoMatch';
 import './App.css';
 
-function App({ store }) {
+const AppRoutes = ({ store }) => (
+  <Switch>
+    <Route path="/" component={Home} exact />
+    <Route path="/page" component={Page} exact />
+    {/* <Route path="/page" render={() => {
+      if (store) {
+        // Bad & ugly just to change the store server side through actions before rendering
+        store.dispatch(addTodo('This should come renderer from server (on /Page direct hit)'));  
+      }
+      
+      return <Page />; 
+    }} exact /> */}
+    <Route render={NoMatch} />
+  </Switch>
+)
+
+function App({ store, location }) {
   return (
     <Provider store={store}>
-      <Home />
+      {
+        location
+        ? (
+          <StaticRouter location={location} context={{}}>
+            <AppRoutes store={store}/>
+          </StaticRouter>
+        ) : (
+          <BrowserRouter>
+            <AppRoutes/>
+          </BrowserRouter>  
+        )
+      }
     </Provider>
   );
 }
