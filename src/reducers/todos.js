@@ -1,10 +1,11 @@
 const todos = (state = [], action) => {
   switch (action.type) {
     case 'ADD_TODO':
+      const nextTaskId = state ? state.length : 0;
       return [
         ...state,
         {
-          id: action.id,
+          id: nextTaskId,
           text: action.text,
           completed: false
         }

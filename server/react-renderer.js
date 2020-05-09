@@ -3,17 +3,17 @@ const renderToString = require('react-dom/server').renderToString;
 const matchPath = require('react-router').matchPath;
 const path = require('path');
 const fs = require('fs');
-// const configureStore = require('../src/configure-store').default;
+const configureStore = require('../src/config-store').default;
 
-// const initialState = {
-//   todos: [
-//     {
-//       id: 0,
-//       text: 'Task in initialState from server',
-//       completed: false
-//     },
-//   ],
-// };
+const initialState = {
+  todos: [
+    {
+      id: 0,
+      text: 'Task in initialState from server',
+      completed: false
+    },
+  ],
+};
 
 /**
  * Import our main App component
@@ -65,7 +65,7 @@ exports.render = (routes) => {
           console.log(`SSR of ${req.path}`);
         }
 
-        // const store = configureStore(initialState);
+        const store = configureStore(initialState);
 
         /**
          * Convert JSX code to a HTML string that can be rendered server-side with
@@ -75,9 +75,9 @@ exports.render = (routes) => {
          * rendered HTML and only attach event handlers. 
          * (https://reactjs.org/docs/react-dom-server.html#rendertostring)
          */
-        // const jsx = <App store={store} location={location}/>
-        // const reactDom = renderToString(jsx);
-        const reactDom = renderToString(<App />);
+        const jsx = <App store={store} />;
+        const reactDom = renderToString(jsx);
+        // const reactDom = renderToString(<App />);
 
         /**
          * inject the rendered app and it state 
@@ -88,10 +88,10 @@ exports.render = (routes) => {
             '<div id="root"></div>',
             `<div id="root">${reactDom}</div>`
           )
-          // .replace(
-          //   '__REDUX__',
-          //   JSON.stringify(store.getState())
-          // )
+          .replace(
+            '__REDUX__',
+            JSON.stringify(store.getState())
+          )
         );
       });
     }
