@@ -3,7 +3,7 @@ import Footer from './Footer'
 import AddTodo from './AddTodo'
 import TodoList from './TodoList'
 
-const App = () => (
+const Home = () => (
   <div>
     <AddTodo />
     <TodoList />
@@ -11,4 +11,4 @@ const App = () => (
   </div>
 )
 
-export default App
+export default Home
