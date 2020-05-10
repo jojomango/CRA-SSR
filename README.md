@@ -7,3 +7,7 @@ run CRA in local: `yarn start`
 
 run SSR in local: `yarn build` then run `node server/bootstrap`
 
+log:
+next:
+changing to fetch API in server side,
+need implement redux-thunk and implement loadData in component

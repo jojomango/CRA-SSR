@@ -1,6 +1,7 @@
 const React = require('react')
 const renderToString = require('react-dom/server').renderToString;
-const matchPath = require('react-router').matchPath;
+// const matchPath = require('react-router').matchPath;
+const matchRoutes = require('react-router-config').matchRoutes;
 const path = require('path');
 const fs = require('fs');
 const configureStore = require('../src/config-store').default;
@@ -29,14 +30,15 @@ exports.render = (routes) => {
     /**
      * Take routes collection and see if it's a valid app's route
      */
-    var match = routes.find(route => matchPath(req.path, {
-      path: route,
-      exact: true,
-    }));
+    // var match = routes.find(route => matchRoutes(req.path, {
+    //   path: route,
+    //   exact: true,
+    // }));
+    var matchingRoutes = matchRoutes(routes, req.url); // maybe nesting route, would return array
 
     const is404 = req._possible404;
     
-    if (match || is404) {
+    if (matchingRoutes || is404) {
       /**
        * Point to the html file created by CRA's build tool and open it
        */
@@ -64,35 +66,37 @@ exports.render = (routes) => {
           res.writeHead(200, { 'Content-Type': 'text/html' })
           console.log(`SSR of ${req.path}`);
         }
-
         const store = configureStore(initialState);
 
-        /**
-         * Convert JSX code to a HTML string that can be rendered server-side with
-         * `renderToString` a method provided by ReactDOMServer
-         *
-         * This sets up the app so that calling ReactDOM.hydrate() will preserve the
-         * rendered HTML and only attach event handlers. 
-         * (https://reactjs.org/docs/react-dom-server.html#rendertostring)
-         */
-        const jsx = <App store={store} location={location} />;
-        const reactDom = renderToString(jsx);
-        // const reactDom = renderToString(<App />);
+        let promises = [];
 
-        /**
-         * inject the rendered app and it state 
-         * into our html and send it
-         */
-        return res.end(
-          htmlData.replace(
-            '<div id="root"></div>',
-            `<div id="root">${reactDom}</div>`
-          )
-          .replace(
-            '__REDUX__',
-            JSON.stringify(store.getState())
-          )
-        );
+        matchingRoutes.forEach(route => {
+          if (route.loadData) {
+            promises.push(route.loadData());
+          }
+        });
+
+        Promise.all(promises).then(dataArr => {
+          const jsx = <App store={store} location={location} />;
+          const reactDom = renderToString(jsx);
+
+          /**
+           * inject the rendered app and it state 
+           * into our html and send it
+           */
+          return res.end(
+            htmlData.replace(
+              '<div id="root"></div>',
+              `<div id="root">${reactDom}</div>`
+            )
+            .replace(
+              '__REDUX__',
+              JSON.stringify(store.getState())
+            )
+          );
+        });
+
+        
       });
     }
     else {

@@ -4,7 +4,8 @@ const path = require('path');
 const PORT = 3000;
 
 const reactRenderer = require('./react-renderer');
-const routes = ['/', '/page'];
+const routes = require('../src/App').Routes;
+
 
 /**
  * initialize the application and create the routes
